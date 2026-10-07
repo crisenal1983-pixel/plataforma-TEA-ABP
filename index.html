@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#F4F6F8">
+  <meta name="description" content="Plataforma Web Interactiva de Secuenciación Visual de Tareas para la Reducción de Ansiedad en Niños con TEA.">
+  <title>Secuenciación Visual TEA - U. Salesiana</title>
+  
+  <style>
+    /* =============================================================================
+       styles.css — Diseño unificado (Landing + SPA TEA + Módulo Profesionales)
+       ============================================================================= */
+    :root {
+      --fondo: #F4F6F8; --tarjeta: #FFFFFF; --borde: #D5DCE3; --texto: #1F2933; --texto-suave: #4A5663;
+      --acento: #2F5D8C; --acento-hover: #274F77; --acento-texto: #FFFFFF;
+      --exito-fondo: #E8F5E9; --exito-borde: #A5D6A7; --exito-texto: #1B5E20; --foco: #1B3A57;
+      --sombra: 0 2px 10px rgba(31, 41, 51, 0.06);
+      --fuente: "Montserrat Alternates", "Segoe UI", system-ui, sans-serif;
+      --radio: 1.25rem; --alto-boton: 5rem;
+      --c-osc: #013A4D; --c-cian: #00789A; --c-crema: #ECE9D2; --c-pale: #EAF4FA; --c-anillo: #E0F5FD; --lp-nav: 5rem;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { font-size: 100%; -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    body { margin: 0; min-height: 100vh; background: var(--fondo); color: var(--texto); font-family: var(--fuente); font-size: 1.25rem; line-height: 1.5; -webkit-tap-highlight-color: transparent; }
+
+    /* ESTILOS INTERNOS DE RUTINAS */
+    .contenedor { width: 100%; max-width: 40rem; margin: 0 auto; padding: 1.5rem 1rem 2.5rem; }
+    h1:focus { outline: none; }
+    .pantalla { padding-top: 1rem; }
+    .tarjeta { background: var(--tarjeta); border: 2px solid var(--borde); border-radius: var(--radio); box-shadow: var(--sombra); padding: 2rem 1.5rem; margin-bottom: 1.5rem; }
+    .tarjeta.completada { background: var(--exito-fondo); border-color: var(--exito-borde); }
+    .tarjeta.completada h1, .tarjeta.completada .detalle, .tarjeta.completada .progreso { color: var(--exito-texto); }
+    .pictograma { font-size: clamp(6rem, 24vw, 9.5rem); line-height: 1.1; text-align: center; margin: 1rem 0 1.25rem; user-select: none; }
+    .progreso { margin: 0 0 0.75rem; text-align: center; font-size: 1.15rem; font-weight: 600; color: var(--texto-suave); }
+    .puntos { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.6rem; }
+    .punto { width: 0.9rem; height: 0.9rem; border-radius: 50%; border: 2px solid #6B7785; background: transparent; }
+    .punto.actual { background: var(--acento); border-color: var(--acento); }
+    .punto.hecho { background: #2E7D32; border-color: #2E7D32; }
+    button { font-family: inherit; cursor: pointer; }
+    .btn { display: block; width: 100%; min-height: var(--alto-boton); padding: 1rem 1.5rem; border: 2px solid transparent; border-radius: var(--radio); font-size: 1.6rem; font-weight: 700; }
+    .btn-primario { background: var(--acento); color: var(--acento-texto); }
+    .btn-primario:hover { background: var(--acento-hover); }
+    .btn-secundario { margin-top: 1rem; min-height: 4rem; background: transparent; color: var(--texto-suave); border-color: var(--borde); font-size: 1.2rem; font-weight: 600; }
+    .btn-secundario:hover { background: #E9EEF2; }
+    .lista-rutinas { list-style: none; margin: 2rem 0 0; padding: 0; display: grid; gap: 1.25rem; }
+    .btn-rutina { display: flex; align-items: center; gap: 1.25rem; width: 100%; min-height: 6.5rem; padding: 1.25rem 1.5rem; text-align: left; color: var(--texto); background: var(--tarjeta); border: 2px solid var(--borde); border-radius: var(--radio); box-shadow: var(--sombra); }
+    .btn-rutina:hover { background: #FAFBFC; border-color: #B8C3CE; }
+    .rutina-emoji { font-size: 3.5rem; line-height: 1; }
+    .rutina-texto { display: flex; flex-direction: column; }
+    .rutina-titulo { font-size: 1.6rem; font-weight: 700; margin:0;}
+    .rutina-pasos { font-size: 1.1rem; color: var(--texto-suave); }
+
+    /* ---------- LANDING PAGE ---------- */
+    .contenedor:has(.lp) { max-width: none; padding: 0; }
+    .lp { padding-top: var(--lp-nav); text-align: left; overflow-x: clip; color: var(--c-osc); }
+    .lp h1, .lp h2, .lp h3 { margin: 0; text-align: left; font-family: 'Fredoka', 'Trebuchet MS', system-ui, sans-serif; font-variant: small-caps; font-weight: 600; line-height: 1.2; color: var(--c-osc); }
+    .lp p { margin: 0; }
+    .lp-wrap { width: 100%; max-width: 72rem; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* Navbar */
+    .lp-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(--lp-nav); background: #fff; }
+    .lp-nav.con-sombra { box-shadow: 0 2px 8px rgba(1,58,77,.15); }
+    .lp-nav .lp-wrap { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .lp-nav-logo { display: flex; align-items: center; gap: 0.8rem; text-decoration: none; }
+    .lp-nav-logo img { height: 3.8rem; width: auto; display: block; }
+    .lp-nav-titulo { font-size: 0.75rem; font-weight: 700; color: var(--c-osc); max-width: 400px; line-height: 1.2; text-transform: uppercase; }
+    @media (max-width: 950px) { .lp-nav-titulo { display: none; } }
+    .lp-menu { display: flex; align-items: center; gap: 1.25rem; list-style: none; margin: 0; padding: 0; }
+    .lp-menu a { display: block; padding: .6rem .5rem; color: var(--c-osc); text-decoration: none; font-family: 'Fredoka', sans-serif; font-variant: small-caps; font-size: 1.2rem; font-weight: 600; border-bottom: 3px solid transparent; }
+    .lp-menu a:hover { border-bottom-color: var(--c-cian); }
+
+    /* Hero */
+    .lp-hero { position: relative; background-color: #087894; background-size: cover; background-position: center; border-radius: 0 0 50% 50% / 0 0 70px 70px; padding: 4.5rem 0 7rem; color: #fff; }
+    .lp-hero .lp-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
+    .lp-hero h1 { margin-bottom: 1.25rem; font-size: clamp(2.2rem, 4.6vw, 3.4rem); color: #fff; }
+    .lp-ondita { height: 14px; margin-bottom: 1.5rem; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='14' viewBox='0 0 28 14'%3E%3Cpath d='M0 7Q7 -2 14 7T28 7' fill='none' stroke='white' stroke-width='3'/%3E%3C/svg%3E") repeat-x; }
+    .lp-hero-txt p { font-size: 1.2rem; font-weight: 600; line-height: 1.6; max-width: 34rem; }
+    
+    /* Formulario */
+    .lp-form-tit { margin-bottom: 1.25rem; font-size: 2rem; color: #C9F2FB !important; }
+    .lp-campo { margin-bottom: 1rem; }
+    .lp-fila { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .lp-campo label { display: block; margin-bottom: .3rem; font-size: 1rem; font-weight: 700; color: #fff; }
+    .lp-campo input, .lp-campo select { width: 100%; min-height: 3.2rem; padding: .5rem .9rem; font: inherit; font-size: 1.1rem; color: var(--c-osc); background: #fff; border: 2px solid #fff; }
+    .lp-campo [aria-invalid="true"] { border-color: #FFD84D; }
+    .lp-error { margin-top: .3rem; font-size: 1rem; font-weight: 700; color: #FFE58A; }
+    .lp-check { display: flex; gap: .75rem; align-items: flex-start; margin-bottom: .5rem; }
+    .lp-check input { flex: 0 0 auto; width: 1.75rem; height: 1.75rem; margin-top: .1rem; }
+    .lp-check label { font-size: 1rem; font-weight: 600; color: #fff; }
+    .lp-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 3.5rem; padding: .8rem 1.75rem; font: inherit; font-size: 1.15rem; font-weight: 700; color: var(--c-osc); background: #fff; border: 2px solid #fff; cursor: pointer; width: 100%; margin-top: .75rem; }
+    .lp-btn:hover { background: var(--c-anillo); }
+    .lp-btn.borde { color: #fff; background: transparent; }
+    .lp-btn.borde:hover { background: rgba(255,255,255,.15); }
+    .lp-enlace { margin-top: 1rem; padding: .5rem 0; font: inherit; font-size: 1rem; font-weight: 700; color: #fff; background: none; border: 0; text-decoration: underline; cursor: pointer; }
+    .lp-perfil p { margin-bottom: 1rem; font-size: 1.25rem; font-weight: 600; color:#fff;}
+
+    /* Secciones */
+    .lp-sec { position: relative; padding: 4.5rem 0; }
+    .lp-sec.crema { background: var(--c-crema); }
+    .lp-sec.pale { background: var(--c-pale); }
+    .lp-onda { position: absolute; top: -13px; left: 0; right: 0; height: 14px; background-repeat: repeat-x; }
+    .lp-onda.w-pale { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='14' viewBox='0 0 44 14'%3E%3Cpath d='M0 14V7Q5.5 0 11 7T22 7 33 7 44 7V14z' fill='%23EAF4FA'/%3E%3C/svg%3E"); }
+    .lp-onda.w-blanca { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='14' viewBox='0 0 44 14'%3E%3Cpath d='M0 14V7Q5.5 0 11 7T22 7 33 7 44 7V14z' fill='white'/%3E%3C/svg%3E"); }
+    .lp-onda.w-crema { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='14' viewBox='0 0 44 14'%3E%3Cpath d='M0 14V7Q5.5 0 11 7T22 7 33 7 44 7V14z' fill='%23ECE9D2'/%3E%3C/svg%3E"); }
+    .lp-anillo { position: absolute; border: 40px solid var(--c-anillo); border-radius: 50%; pointer-events: none; }
+    .lp-que { position: relative; max-width: 40rem; margin: 0 auto; padding: 2.5rem 2.25rem; text-align: center; background: var(--c-crema); border-radius: 2rem; }
+    .lp-que h2 { text-align: center; font-size: 2.2rem; margin: .5rem 0 1rem; }
+    .lp-tit { text-align: center !important; font-size: clamp(1.9rem, 4vw, 2.6rem); }
+    
+    /* Tarjetas */
+    .lp-cards { position: relative; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 1.6rem; margin-top: 2.5rem; }
+    .lp-tarj { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem; width: 17rem; height: 14.5rem; border-radius: .6rem; text-decoration: none; font-family: 'Fredoka', sans-serif; font-variant: small-caps; font-size: 1.3rem; font-weight: 600; transition: transform 0.3s ease, filter 0.3s ease, box-shadow 0.3s ease; }
+    .lp-tarj svg { width: 4.5rem; height: 4.5rem; }
+    .lp-tarj.t1 { background: var(--c-osc); color: #fff; }
+    .lp-tarj.t2 { background: var(--c-cian); color: #fff; box-shadow: 0 18px 30px rgba(0,120,154,.25); } 
+    .lp-tarj.t3 { background: var(--c-crema); color: var(--c-osc); }
+    .lp-tarj:hover { filter: brightness(1.08); transform: translateY(-12px); box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
+
+    .lp-dos { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 3.5rem; align-items: center; max-width: 62rem; margin: 0 auto; }
+    .lp-texto h2 { margin-bottom: 1.5rem; text-align: center; font-size: 2.4rem; }
+    .lp-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.1rem; }
+    .lp-lista li { position: relative; padding-left: 2rem; font-size: 1rem; line-height: 1.55; }
+    .lp-lista li::before { content: ""; position: absolute; left: 0; top: .45em; width: .6rem; height: .6rem; background: var(--c-osc); border-radius: 50%; box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--c-osc); }
+    .lp-blob { margin: 0; aspect-ratio: 4 / 3.3; overflow: hidden; background: var(--c-anillo); border-radius: 58% 42% 61% 39% / 52% 60% 40% 48%; }
+    .lp-blob img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .lp-dos.inv > :first-child { order: 2; }
+
+    /* Footer */
+    .lp-footer { background: linear-gradient(120deg, rgba(0,100,170,.92), rgba(0,181,216,.92)); background-size: cover; background-position: center; color: #fff; padding: 3rem 0; }
+    .lp-footer .lp-wrap { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 2.5rem; align-items: center; }
+    .lp-footer img { height: 6rem; width: auto; display: block; background: #fff; border-radius: 50%; padding: .35rem; }
+    .lp-footer h3 { margin-bottom: .75rem; font-size: 1.5rem; color: #fff; }
+    .lp-footer p { margin: .35rem 0; font-size: 1.05rem; font-weight: 600; }
+    .lp-copy { background: #fff; padding: .9rem 1rem; text-align: center; font-size: .9rem; color: var(--c-osc); }
+
+    /* Modal Tutores */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(31, 41, 51, 0.85); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; backdrop-filter: blur(4px); }
+    .modal-contenido { background: var(--tarjeta); padding: 2.5rem; border-radius: var(--radio); max-width: 500px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+    .modal-contenido h3 { color: var(--acento); margin-top: 0; font-size: 1.5rem; }
+    .oculto { display: none !important; }
+
+    /* ---------- CSS DEL MÓDULO DE PROFESIONALES ---------- */
+    .mod-prof { padding: 6rem 5% 4rem; max-width: 1200px; margin: 0 auto; color: var(--c-osc); }
+    .mod-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; border-bottom: 2px solid var(--borde); padding-bottom: 1rem; }
+    .mod-filtros { display: flex; gap: 1rem; align-items: center; background: var(--tarjeta); padding: 1.5rem; border-radius: 1rem; box-shadow: var(--sombra); margin-bottom: 2rem; flex-wrap: wrap; }
+    .mod-filtros select, .mod-filtros input { padding: 0.6rem; border: 1px solid var(--borde); border-radius: 0.5rem; font: inherit; font-size: 1rem; }
+    .mod-filtros label { font-weight: bold; font-size: 0.95rem; }
+    
+    .mod-tabla-wrap { overflow-x: auto; background: var(--tarjeta); border-radius: 1rem; box-shadow: var(--sombra); }
+    .mod-tabla { width: 100%; border-collapse: collapse; text-align: left; font-size: 1.05rem; }
+    .mod-tabla th { background: var(--c-osc); color: #fff; padding: 1.2rem 1rem; font-weight: 600; white-space: nowrap; }
+    .mod-tabla td { padding: 1rem; border-bottom: 1px solid var(--borde); color: var(--texto); }
+    .mod-tabla tr:hover td { background: var(--c-pale); }
+    .mod-loader { text-align: center; padding: 4rem; font-size: 1.5rem; font-weight: bold; color: var(--c-cian); }
+
+    @media (max-width: 860px) {
+      .lp-hero { padding: 3rem 0 5rem; }
+      .lp-hero .lp-wrap, .lp-dos, .lp-footer .lp-wrap { grid-template-columns: 1fr; gap: 2rem; }
+      .lp-dos.inv > :first-child { order: 0; }
+      .lp-fila { grid-template-columns: 1fr; gap: 0; }
+      .mod-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Montserrat+Alternates:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <main id="app" class="contenedor"></main>
+
+  <script>
+    'use strict';
+    (() => {
+
+      // CONFIGURACIÓN DE TU BACKEND
+      const CONFIG = {
+        API_URL: 'https://script.google.com/macros/s/AKfycbxxOts8WiwkkzMA7rxuW5x8HHKZi4Lv0UbGq6uZj5SxSZzGM80XGOo_7FZrpcWGnTX3/exec',
+        CLAVE_COLA: 'tea_cola_telemetria_v1',
+        CLAVE_USUARIO: 'tea_id_usuario',
+        USUARIO_POR_DEFECTO: 'NINO_DEMO',
+        INTERVALO_REINTENTO_MS: 30000,
+        TAMANO_LOTE: 25,
+        DEPURAR: false
+      };
+
+      const RUTINAS = [
+        { id: 'RUT_MANANA', titulo: 'Mi mañana', emoji: '🌅', tareas: [
+            { id: 'MAN_01', emoji: '🛏️', etiqueta: 'Cama', titulo: 'Levantarme', detalle: 'Salgo de la cama con calma.' },
+            { id: 'MAN_02', emoji: '🚽', etiqueta: 'Baño', titulo: 'Ir al baño', detalle: 'Hago pipí y me lavo las manos.' },
+            { id: 'MAN_03', emoji: '🦷', etiqueta: 'Diente', titulo: 'Lavarme los dientes', detalle: 'Cepillo arriba y abajo.' },
+            { id: 'MAN_04', emoji: '👕', etiqueta: 'Camiseta', titulo: 'Ponerme la ropa', detalle: 'Me visto con mi ropa del día.' },
+            { id: 'MAN_05', emoji: '🥣', etiqueta: 'Plato de desayuno', titulo: 'Tomar el desayuno', detalle: 'Como mi desayuno sentado.' }
+          ]
+        },
+        { id: 'RUT_ESCUELA', titulo: 'Ir a la escuela', emoji: '🏫', tareas: [
+            { id: 'ESC_01', emoji: '🎒', etiqueta: 'Mochila', titulo: 'Tomar mi mochila', detalle: 'Reviso que mi mochila esté lista.' },
+            { id: 'ESC_02', emoji: '👟', etiqueta: 'Zapatos', titulo: 'Ponerme los zapatos', detalle: 'Me siento y me pongo los zapatos.' },
+            { id: 'ESC_03', emoji: '🚌', etiqueta: 'Transporte', titulo: 'Subir al transporte', detalle: 'Voy con un adulto hasta la escuela.' },
+            { id: 'ESC_04', emoji: '🏫', etiqueta: 'Escuela', titulo: 'Llegar a la escuela', detalle: 'Entro a mi salón.' }
+          ]
+        },
+        { id: 'RUT_NOCHE', titulo: 'Antes de dormir', emoji: '🌙', tareas: [
+            { id: 'NOC_01', emoji: '🛁', etiqueta: 'Bañera', titulo: 'Bañarme', detalle: 'Me baño con agua tibia.' },
+            { id: 'NOC_02', emoji: '🦷', etiqueta: 'Diente', titulo: 'Lavarme los dientes', detalle: 'Cepillo arriba y abajo.' },
+            { id: 'NOC_03', emoji: '🩳', etiqueta: 'Pijama', titulo: 'Ponerme el pijama', detalle: 'Me pongo ropa cómoda para dormir.' },
+            { id: 'NOC_04', emoji: '📖', etiqueta: 'Libro', titulo: 'Leer un cuento', detalle: 'Escucho o leo un cuento tranquilo.' },
+            { id: 'NOC_05', emoji: '😴', etiqueta: 'Persona durmiendo', titulo: 'Dormir', detalle: 'Apago la luz y descanso.' }
+          ]
+        }
+      ];
+
+      // Protecciones anti-errores en memoria local
+      let ID_USUARIO;
+      try { ID_USUARIO = localStorage.getItem(CONFIG.CLAVE_USUARIO) || CONFIG.USUARIO_POR_DEFECTO; } catch(e) { ID_USUARIO = CONFIG.USUARIO_POR_DEFECTO; }
+      
+      const generarIdEvento = () => 'ev-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
+      
+      let cola = [];
+      try { 
+        const crudo = localStorage.getItem(CONFIG.CLAVE_COLA); 
+        if(crudo) { cola = JSON.parse(crudo); if(!Array.isArray(cola)) cola = []; } 
+      } catch (_) { cola = []; }
+      
+      function encolar(registro) {
+        cola.push(registro);
+        try { localStorage.setItem(CONFIG.CLAVE_COLA, JSON.stringify(cola)); } catch (_) {}
+      }
+
+      let sincronizando = false;
+      async function sincronizar() {
+        if (sincronizando || cola.length === 0 || !CONFIG.API_URL.startsWith('http') || !navigator.onLine) return;
+        sincronizando = true;
+        try {
+          while (cola.length > 0) {
+            const lote = cola.slice(0, CONFIG.TAMANO_LOTE);
+            const respuesta = await fetch(CONFIG.API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ registros: lote }) });
+            if (!respuesta.ok) throw new Error('Error HTTP');
+            const enviados = new Set(lote.map(r => r.ID_Evento));
+            cola = cola.filter(r => !enviados.has(r.ID_Evento));
+            try { localStorage.setItem(CONFIG.CLAVE_COLA, JSON.stringify(cola)); } catch (_) {}
+          }
+        } catch (err) { console.log('Sync pospuesta'); } 
+        finally { sincronizando = false; }
+      }
+
+      // ESTADO: Se agrega datosReporte para el Módulo Médico
+      const estado = { vista: 'landing', rutina: null, indice: 0, completada: false, inicioMs: 0, inicioISO: '', datosReporte: null, cargandoReporte: false };
+
+      function el(etiqueta, props = {}, ...hijos) {
+        const nodo = document.createElement(etiqueta);
+        for (const [clave, valor] of Object.entries(props)) {
+          if (clave === 'class') nodo.className = valor;
+          else if (clave === 'text') nodo.textContent = valor;
+          else if (clave.startsWith('on') && typeof valor === 'function') nodo.addEventListener(clave.slice(2), valor);
+          else nodo.setAttribute(clave, valor);
+        }
+        hijos.flat().forEach(h => { if (h !== null && h !== undefined) nodo.append(h); });
+        return nodo;
+      }
+
+      function render() {
+        const raiz = document.getElementById('app');
+        if (estado.vista === 'landing') raiz.replaceChildren(vistaLanding());
+        else if (estado.vista === 'menu') raiz.replaceChildren(vistaMenu());
+        else if (estado.vista === 'tarea') raiz.replaceChildren(vistaTarea());
+        else if (estado.vista === 'fin') raiz.replaceChildren(vistaFin());
+        else if (estado.vista === 'profesionales') raiz.replaceChildren(vistaProfesionales());
+        window.scrollTo(0, 0);
+      }
+
+      function vistaLanding() {
+        
+        const IMG = { hero: 'nino_tablet_2.jpg', familias: 'familia.jfif', profesionales: 'profesionales.png', autismo: 'apoyo autismo.jfif', footer: 'image_d7dde1.png' };
+        
+        const CLAVE_PERFIL = 'tea_perfil_nino';
+        const leerPerfil = () => { try { const p = JSON.parse(localStorage.getItem(CLAVE_PERFIL)); return (p && typeof p === 'object' && p.codigo) ? p : null; } catch (_) { return null; } };
+        const perfil = leerPerfil();
+        
+        const svg = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstChild; };
+        const abrirModal = () => document.getElementById('modal-tutores').classList.remove('oculto');
+        const cerrarModal = () => document.getElementById('modal-tutores').classList.add('oculto');
+        const usarCodigo = (c) => { ID_USUARIO = c; try { localStorage.setItem(CONFIG.CLAVE_USUARIO, c); } catch (_) {} };
+        const generarCodigo = () => 'N-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+        const irAlFormulario = () => { document.getElementById('formulario').scrollIntoView(); document.getElementById('rg-alias').focus(); };
+
+        const modalTutores = el('div', { class: 'modal-overlay oculto', id: 'modal-tutores' },
+          el('div', { class: 'modal-contenido' },
+            el('h3', { text: 'Consentimiento y Telemetría' }),
+            el('p', { text: 'Esta plataforma es parte de una investigación de la U. Salesiana de Bolivia.' }),
+            el('p', { text: 'Al usar las rutinas, se registran los tiempos de forma anónima mediante un código. No envíe nombres completos.' }),
+            el('button', { class: 'btn btn-primario', type: 'button', onclick: cerrarModal, text: 'Cerrar' })));
+
+        // NAVBAR CON ENLACE AL PORTAL MÉDICO
+        const nav = el('nav', { class: 'lp-nav', 'aria-label': 'Navegación principal' },
+          el('div', { class: 'lp-wrap' }, 
+            el('a', { class: 'lp-nav-logo', href: '#inicio', 'aria-label': 'Inicio' }, 
+              el('img', { src: IMG.footer, alt: 'Logo Universidad Salesiana de Bolivia' }),
+              el('span', { class: 'lp-nav-titulo', text: 'Proyecto ABP - “PLATAFORMA WEB INTERACTIVA DE SECUENCIACIÓN VISUAL DE TAREAS PARA LA REDUCCIÓN DE ANSIEDAD EN NIÑOS CON TRASTORNO DEL ESPECTRO AUTISTA (TEA).”' })
+            ), 
+            el('ul', { class: 'lp-menu', id: 'lp-menu' },
+              el('li', {}, el('a', { href: '#que-hacemos', text: 'Qué hacemos' })),
+              el('li', {}, el('a', { href: '#servicios', text: 'Servicios' })),
+              el('li', {}, el('a', { href: '#formulario', text: 'Formulario' })),
+              el('li', {}, el('a', { href: '#', style: 'color: var(--c-cian);', onclick: (e) => { e.preventDefault(); estado.vista = 'profesionales'; render(); }, text: 'Portal Médico' }))
+            )));
+
+        // FORMULARIO CON VALIDACIÓN EN PANTALLA
+        const campo = (id, etiqueta, control) => el('div', { class: 'lp-campo' }, el('label', { for: id, text: etiqueta }), control, el('p', { class: 'lp-error', id: id + '-err' }));
+        const opcion = (v, t) => el('option', { value: v, text: t });
+        const iAlias = el('input', { type: 'text', id: 'rg-alias', maxlength: '20' });
+        const iEdad = el('select', { id: 'rg-edad' }, opcion('', 'Elige'), Array.from({ length: 16 }, (_, i) => opcion(String(i + 2), (i + 2) + ' años')));
+        const iRel = el('select', { id: 'rg-rel' }, opcion('', 'Elige'), opcion('madre', 'Madre'), opcion('padre', 'Padre'), opcion('tutor', 'Tutor'));
+        const iOk = el('input', { type: 'checkbox', id: 'rg-ok' });
+        
+        const enviar = (e) => {
+          e.preventDefault();
+          const alias = iAlias.value.trim();
+          
+          const reglas = [
+            [iAlias, (!alias || alias.length > 20) ? 'Escribe un apodo corto.' : ''], 
+            [iEdad, iEdad.value ? '' : 'Elige la edad.'], 
+            [iRel, iRel.value ? '' : 'Elige una opción.'], 
+            [iOk, iOk.checked ? '' : 'Debes aceptar el consentimiento.']
+          ];
+          
+          let primero = null;
+          reglas.forEach(([c, msg]) => { 
+            const errNode = document.getElementById(c.id + '-err');
+            if(errNode) errNode.textContent = msg; 
+            c.setAttribute('aria-invalid', msg ? 'true' : 'false'); 
+            if (msg && !primero) primero = c; 
+          });
+          if (primero) { primero.focus(); return; }
+
+          const codigo = generarCodigo();
+          try { localStorage.setItem(CLAVE_PERFIL, JSON.stringify({ alias, edad: iEdad.value, relacion: iRel.value, codigo })); } catch (_) {}
+          
+          encolar({
+            Tipo: 'Registro',
+            ID_Evento: generarIdEvento(),
+            ID_Usuario: codigo,
+            Alias: alias,
+            Edad: iEdad.value,
+            Relacion: iRel.value,
+            Timestamp: new Date().toISOString()
+          });
+          sincronizar();
+          
+          usarCodigo(codigo); estado.registrarOtro = false; estado.vista = 'menu'; render();
+        };
+
+        const formulario = el('form', { onsubmit: enviar, novalidate: '' },
+          campo('rg-alias', 'Nombre Completo del niño o niña *', iAlias),
+          el('div', { class: 'lp-fila' }, campo('rg-edad', 'Edad *', iEdad), campo('rg-rel', 'Quién registra *', iRel)),
+          el('div', { class: 'lp-check' }, iOk, el('label', { for: 'rg-ok', text: 'Acepto el consentimiento. *' })),
+          el('p', { class: 'lp-error', id: 'rg-ok-err' }),
+          el('button', { class: 'lp-btn', type: 'submit', text: 'Registrar y entrar' }),
+          el('button', { class: 'lp-enlace', type: 'button', onclick: abrirModal, text: 'Leer consentimiento' }));
+
+        const panelPerfil = el('div', { class: 'lp-perfil' },
+          el('p', {}, 'Niño registrado: ', el('b', { text: perfil ? perfil.alias : '' })),
+          el('button', { class: 'lp-btn', type: 'button', onclick: () => { estado.registrarOtro = false; usarCodigo(perfil.codigo); estado.vista = 'menu'; render(); }, text: 'Continuar a las rutinas' }),
+          el('button', { class: 'lp-btn borde', type: 'button', onclick: () => { estado.registrarOtro = true; render(); irAlFormulario(); }, text: 'Registrar a otro niño' }));
+
+        const hero = el('section', { class: 'lp-hero', id: 'inicio', style: `background-image:linear-gradient(rgba(8,120,148,.88),rgba(8,120,148,.88)),url('${IMG.hero}')` },
+          el('div', { class: 'lp-wrap' },
+            el('div', { class: 'lp-hero-txt' },
+              el('h1', { text: 'Apoyando a niños con TEA, un paso a la vez.' }),
+              el('div', { class: 'lp-ondita' }),
+              el('p', { text: 'Plataforma web interactiva para reducir la ansiedad en niños con Trastorno del Espectro Autista.' })),
+            el('div', { id: 'formulario' },
+              el('h2', { class: 'lp-form-tit', text: (perfil && !estado.registrarOtro) ? 'Acceso a rutinas' : 'Registro del niño para INICIAR RUTINA' }),
+              (perfil && !estado.registrarOtro) ? panelPerfil : formulario)));
+
+        // Qué Hacemos
+        const varita = svg('<svg viewBox="0 0 64 64" width="64" height="64" fill="none" stroke="#013A4D" stroke-width="3.5" stroke-linecap="round"><path d="M8 56L38 26"/><path d="M44 6l3 8 8 3-8 3-3 8-3-8-8-3 8-3z"/></svg>');
+        const queHacemos = el('section', { class: 'lp-sec' }, el('div', { class: 'lp-wrap' }, el('div', { class: 'lp-que', id:'que-hacemos' }, varita, el('h2', { text: '¿Qué Hacemos?' }), el('p', { text: 'Presentamos cada rutina diaria como una secuencia visual. Registramos de forma anónima el tiempo de cada paso para evaluar cómo la secuenciación ayuda a reducir la ansiedad.' }))));
+
+        // Servicios / Tarjetas
+        const icono = (d) => svg('<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>');
+        const tarjeta = (cls, href, ico, t) => el('a', { class: 'lp-tarj ' + cls, href }, icono(ico), t);
+        const servicios = el('section', { class: 'lp-sec', id: 'servicios' },
+          el('div', { class: 'lp-wrap' }, el('h2', { class: 'lp-tit', text: 'Servicios Orientados a:' }),
+            el('div', { class: 'lp-cards' },
+              tarjeta('t1', '#familias', '<rect x="24" y="6" width="16" height="34" rx="8"/><circle cx="32" cy="52" r="5"/>', 'Para Familias'),
+              tarjeta('t2', '#profesionales', '<path d="M32 12L6 26l26 14 26-14z"/><path d="M16 33v13c0 4 7 8 16 8s16-4 16-8V33"/><path d="M58 26v14"/><circle cx="58" cy="44" r="3"/>', 'Para Profesionales'),
+              tarjeta('t3', '#autismo', '<rect x="8" y="8" width="48" height="32" rx="2"/><path d="M4 8h56M32 40v12M20 58l12-6 12 6"/>', 'Sobre Autismo'))));
+
+        const lista = (items) => el('ul', { class: 'lp-lista' }, items.map(([n, t]) => el('li', {}, el('b', { text: n + ': ' }), t)));
+        const imagen = (src) => el('figure', { class: 'lp-blob' }, el('img', { src }));
+
+        const familias = el('section', { class: 'lp-sec pale', id: 'familias' }, el('div', { class: 'lp-onda w-pale' }),
+          el('div', { class: 'lp-dos' }, imagen(IMG.familias),
+            el('div', { class: 'lp-texto' }, el('h2', { text: 'Para Familias' }), lista([
+              ['Rutinas paso a paso', 'mañana, escuela y hora de dormir, con pictogramas grandes que anticipan lo que sigue.'],
+              ['Diseño de bajo estímulo', 'alto contraste, textos grandes y sin animaciones bruscas (WCAG 2.1) para evitar la sobrecarga sensorial.'],
+              ['Registro sencillo', 'un adulto registra al niño con un apodo y obtiene un código anónimo para entrar a las rutinas.'],
+              ['Sin conexión', 'las rutinas siguen funcionando aunque se pierda internet, para evitar crisis por desconexión.']]))));
+        
+        const profesionales = el('section', { class: 'lp-sec', id: 'profesionales' }, el('div', { class: 'lp-onda w-blanca' }),
+          el('div', { class: 'lp-dos inv' }, imagen(IMG.profesionales),
+            el('div', { class: 'lp-texto' }, el('h2', { text: 'Para Profesionales' }), lista([
+              ['Telemetría asíncrona', 'captura el tiempo de cada paso sin interrumpir la rutina del niño.'],
+              ['Datos anónimos', 'cada registro se asocia a un código aleatorio, nunca a un nombre.'],
+              ['Resiliencia offline', 'los datos se guardan en el dispositivo y se sincronizan automáticamente cuando vuelve la red.']]))));
+        
+        const autismo = el('section', { class: 'lp-sec crema', id: 'autismo' }, el('div', { class: 'lp-onda w-crema' }),
+          el('div', { class: 'lp-dos' }, imagen(IMG.autismo),
+            el('div', { class: 'lp-texto' }, el('h2', { text: 'Sobre Autismo' }), lista([
+              ['Condición del neurodesarrollo', 'el espectro autista influye en la comunicación, la interacción social y la conducta.'],
+              ['Las rutinas dan seguridad', 'los cambios inesperados pueden generar mucha ansiedad; anticipar lo que sigue ayuda.'],
+              ['Apoyos visuales', 'la secuenciación visual de tareas es una estrategia muy usada para anticipar actividades.']]))));
+
+        const footer = el('footer', {},
+          el('div', { class: 'lp-footer', style: "background-image:linear-gradient(120deg,rgba(0,100,170,.92),rgba(0,181,216,.92)),url('" + IMG.footer + "')" },
+            el('div', { class: 'lp-wrap' },
+              el('img', { src: 'image_d7dde1.png', alt: 'Logo Universidad Salesiana de Bolivia' }),
+              el('div', {}, el('h3', { text: 'Institución' }), el('p', { text: 'Universidad Salesiana de Bolivia' }), el('p', { text: 'Ingeniería de Sistemas · Gestión II-2026' }), el('p', { text: 'Docente: Ph.D. Danilo Chambi' })),
+              el('div', {}, el('h3', { text: 'Desarrollado por' }), el('p', { text: 'Javier Diaz Callisaya' }), el('p', { text: 'Cristian Enríquez Alegria' }), el('p', { text: 'Miguel Angel Villegas Perez' }), el('p', { text: 'Isaac Alvarez Guarachi' })))
+          ),
+          el('p', { class: 'lp-copy', text: '© 2026 Plataforma Web Interactiva de Secuenciación Visual de Tareas para el TEA. Proyecto universitario.' })
+        );
+
+        return el('div', { class: 'lp' }, modalTutores, nav, el('main', {}, hero, queHacemos, servicios, familias, profesionales, autismo), footer);
+      }
+
+      // --- MÓDULO DE PROFESIONALES (NUEVO DASHBOARD) ---
+      function vistaProfesionales() {
+        const cabecera = el('div', { class: 'mod-header' },
+          el('div', {}, 
+            el('h1', { text: 'Panel de Profesionales' }),
+            el('p', { text: 'Registro clínico e historial de pacientes TEA.' })
+          ),
+          el('button', { class: 'lp-btn borde', style: 'background: var(--c-osc); color: white;', onclick: () => { estado.vista = 'landing'; render(); }, text: 'Volver al Inicio' })
+        );
+
+        if (estado.cargandoReporte) {
+          return el('div', { class: 'mod-prof' }, cabecera, el('div', { class: 'mod-loader', text: 'Conectando con Google Sheets y descargando datos...' }));
+        }
+
+        if (!estado.datosReporte) {
+          estado.cargandoReporte = true;
+          fetch(CONFIG.API_URL + '?accion=obtener_reporte')
+            .then(res => res.json())
+            .then(data => { estado.datosReporte = data; estado.cargandoReporte = false; render(); })
+            .catch(err => { console.error(err); estado.cargandoReporte = false; alert("Error de conexión con Sheets"); estado.vista='landing'; render(); });
+          return el('div', { class: 'mod-prof' }, cabecera, el('div', { class: 'mod-loader', text: 'Conectando con Google Sheets y descargando datos...' }));
+        }
+
+        let fEdad = '', fFecha = '';
+        
+        const inputFecha = el('input', { type: 'date', onchange: (e) => { fFecha = e.target.value; actualizarTabla(); } });
+        const selectEdad = el('select', { onchange: (e) => { fEdad = e.target.value; actualizarTabla(); } }, 
+          el('option', { value: '', text: 'Todas las edades' }),
+          ...Array.from({length: 16}, (_, i) => el('option', { value: String(i+2), text: (i+2) + ' años' }))
+        );
+
+        const seccionFiltros = el('div', { class: 'mod-filtros' },
+          el('label', { text: 'Filtrar por Fecha:' }), inputFecha,
+          el('label', { text: 'Filtrar por Edad:' }), selectEdad,
+          el('button', { class: 'lp-btn', style: 'margin:0; padding: 0.5rem 1rem;', onclick: () => { estado.datosReporte = null; render(); }, text: '🔄 Actualizar' })
+        );
+
+        const cuerpoTabla = el('tbody', {});
+        const tabla = el('div', { class: 'mod-tabla-wrap' }, 
+          el('table', { class: 'mod-tabla' },
+            el('thead', {}, el('tr', {}, 
+              el('th', { text: 'Código Paciente' }), el('th', { text: 'Apodo' }), el('th', { text: 'Edad' }), 
+              el('th', { text: 'Registrado por' }), el('th', { text: 'Fecha Registro' }), el('th', { text: 'Tareas Realizadas' })
+            )),
+            cuerpoTabla
+          )
+        );
+
+        function actualizarTabla() {
+          cuerpoTabla.innerHTML = '';
+          const usuarios = estado.datosReporte.usuarios.slice(1); 
+          const metricas = estado.datosReporte.metricas.slice(1);
+          
+          let resultados = usuarios.filter(fila => {
+            if (!fila || fila.length < 6) return false;
+            const edadPaciente = String(fila[3]);
+            const fechaValida = new Date(fila[5]);
+            const fechaRegistroISO = isNaN(fechaValida) ? '' : fechaValida.toISOString().split('T')[0];
+            
+            const cumpleEdad = fEdad === '' || edadPaciente === fEdad;
+            const cumpleFecha = fFecha === '' || fechaRegistroISO === fFecha;
+            return cumpleEdad && cumpleFecha;
+          });
+
+          if (resultados.length === 0) {
+            cuerpoTabla.appendChild(el('tr', {}, el('td', { colspan: 6, text: 'No se encontraron pacientes registrados con esos filtros.', style: 'text-align:center; padding: 2rem;' })));
+            return;
+          }
+
+          resultados.forEach(u => {
+            const idUsuario = u[1];
+            const tareasCompletadas = metricas.filter(m => m[1] === idUsuario).length;
+            cuerpoTabla.appendChild(el('tr', {},
+              el('td', { text: idUsuario }), el('td', { text: u[2] }), el('td', { text: u[3] + ' años' }),
+              el('td', { text: u[4] }), el('td', { text: isNaN(new Date(u[5])) ? 'Sin fecha' : new Date(u[5]).toLocaleDateString() }),
+              el('td', { text: tareasCompletadas, style: 'font-weight: bold; color: var(--acento);' })
+            ));
+          });
+        }
+
+        actualizarTabla();
+        return el('div', { class: 'mod-prof' }, cabecera, seccionFiltros, tabla);
+      }
+
+      function vistaMenu() {
+        const lista = el('ul', { class: 'lista-rutinas' }, RUTINAS.map(r => el('li', {}, el('button', { class: 'btn-rutina', onclick: () => { estado.rutina = r; estado.indice = 0; estado.completada = false; estado.vista = 'tarea'; estado.inicioMs = performance.now(); estado.inicioISO = new Date().toISOString(); render(); } }, el('span', { class: 'rutina-emoji', text: r.emoji }), el('span', { class: 'rutina-texto' }, el('h2', { class: 'rutina-titulo', text: r.titulo }), el('span', { class: 'rutina-pasos', text: r.tareas.length + ' pasos' }) ) ) ) ) );
+        const botonVolver = el('button', { class: 'btn btn-secundario', style: 'margin-top: 2rem;', onclick: () => { estado.vista = 'landing'; render(); }, text: 'Volver a la página principal' });
+        return el('div', { class: 'contenedor' }, el('section', { class: 'pantalla' }, el('h1', { text: '¿Qué vamos a hacer?' }), lista, botonVolver));
+      }
+
+      function vistaTarea() {
+        const tarea = estado.rutina.tareas[estado.indice]; const total = estado.rutina.tareas.length; const hecha = estado.completada;
+        const puntos = el('div', { class: 'puntos' }, estado.rutina.tareas.map((_, i) => el('span', { class: 'punto' + (i < estado.indice || (i === estado.indice && hecha) ? ' hecho' : i === estado.indice ? ' actual' : '') })));
+        const tarjeta = el('article', { class: 'tarjeta' + (hecha ? ' completada' : '') }, el('p', { class: 'progreso', text: `Paso ${estado.indice + 1} de ${total}` }), puntos, el('div', { class: 'pictograma', text: hecha ? '✅' : tarea.emoji }), el('h1', { text: hecha ? '¡Muy bien!' : tarea.titulo }), el('p', { class: 'detalle', text: hecha ? 'Terminaste: ' + tarea.titulo : tarea.detalle }) );
+        const bAccion = hecha ? el('button', { class: 'btn btn-primario', onclick: () => { estado.indice++; if (estado.indice >= total) estado.vista = 'fin'; else { estado.completada = false; estado.inicioMs = performance.now(); estado.inicioISO = new Date().toISOString(); } render(); }, text: estado.indice + 1 === total ? 'Terminar' : 'Siguiente paso' }) : el('button', { class: 'btn btn-primario', onclick: () => { estado.completada = true; encolar({ Tipo: 'Metrica', ID_Evento: generarIdEvento(), ID_Usuario: ID_USUARIO, ID_Rutina: estado.rutina.id, ID_Tarea: tarea.id, Timestamp_Inicio: estado.inicioISO, Timestamp_Fin: new Date().toISOString(), Tiempo_Total: Math.round((performance.now() - estado.inicioMs) / 10) / 100, Offline_Al_Registrar: !navigator.onLine }); sincronizar(); render(); }, text: 'Completado' });
+        return el('div', { class: 'contenedor' }, el('section', { class: 'pantalla' }, tarjeta, bAccion, el('button', { class: 'btn btn-secundario', onclick: () => { estado.vista = 'menu'; render(); }, text: 'Volver al inicio' }) ));
+      }
+
+      function vistaFin() { return el('div', { class: 'contenedor' }, el('section', { class: 'pantalla' }, el('article', { class: 'tarjeta completada' }, el('div', { class: 'pictograma', text: '🌟' }), el('h1', { text: '¡Terminaste tu rutina!' }) ), el('button', { class: 'btn btn-primario', onclick: () => { estado.vista = 'menu'; render(); }, text: 'Volver al inicio' }) )); }
+
+      function iniciar() {
+        render();
+        window.addEventListener('online', sincronizar);
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') sincronizar(); });
+        setInterval(sincronizar, CONFIG.INTERVALO_REINTENTO_MS);
+        sincronizar();
+      }
+
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar); else iniciar();
+    })();
+  </script>
+</body>
+</html>
